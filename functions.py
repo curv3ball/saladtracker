@@ -2,7 +2,6 @@ from os import system
 import ctypes
 import time
 import psutil
-from data import Conditions as data
 from widgets import Widgets
 from dearpygui import dearpygui
 from selenium import webdriver
@@ -11,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchWindowException
-from init import WINDOW_TAG
+from init import window_settings
 
 class Console:
     @staticmethod
@@ -144,7 +143,7 @@ class WebScraper:
         # do something with the data, figure out how to plot it maybe would be cool
         with dearpygui.table(header_row=True, policy=dearpygui.mvTable_SizingFixedFit, no_host_extendX=False,
             borders_innerV=True, delay_search=True, borders_outerV=True, borders_innerH=True,
-            borders_outerH=True, parent=WINDOW_TAG, tag="table_stats"):
+            borders_outerH=True, parent=window_settings.WINDOW_TAG, tag="table_stats"):
 
             dearpygui.add_table_column(label="Hours", width_stretch=True)
             dearpygui.add_table_column(label="Container", width_stretch=True)
