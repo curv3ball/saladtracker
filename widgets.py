@@ -4,7 +4,7 @@ from init import window_settings
 class Widgets:
     """custom dearpygui widgets"""
     @staticmethod
-    def label(text: str, tag: str, indent: int = -1):
+    def label(text: str, tag: str, indent: int = -1) -> None:
         """spawns a label"""
         dearpygui.add_text(
             parent          = window_settings.WINDOW_TAG,
@@ -14,7 +14,7 @@ class Widgets:
         )
 
     @staticmethod
-    def button(text: str, tag: str, callback: any = None, width: int = 234):
+    def button(text: str, tag: str, callback: any = None, width: int = 234) -> None:
         """spawns a button"""
         dearpygui.add_button(
             parent      = window_settings.WINDOW_TAG,
@@ -25,7 +25,7 @@ class Widgets:
         )
 
     @staticmethod
-    def textbox(text: str, tag: str, password: bool = False, hint: str = ""):
+    def textbox(text: str, tag: str, password: bool = False, hint: str = "") -> None:
         """spawns a textbox"""
         dearpygui.add_input_text(
             parent      = window_settings.WINDOW_TAG,
@@ -38,7 +38,7 @@ class Widgets:
         )
 
     @staticmethod
-    def slider_int(text: str, tag: str, clamps: tuple = (0, 100), callback: any = None):
+    def slider_int(text: str, tag: str, clamps: tuple = (0, 100), callback: any = None) -> None:
         """spawns a slider"""
         dearpygui.add_slider_int(
             parent      = window_settings.WINDOW_TAG,

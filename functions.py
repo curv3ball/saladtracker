@@ -15,12 +15,12 @@ from init import window_settings
 
 class Console:
     @staticmethod
-    def clear():
+    def clear() -> None:
         """clears the console window"""
         system("cls")
 
     @staticmethod
-    def hide():
+    def hide() -> None:
         """hides the console window"""
         kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
         user32 = ctypes.WinDLL('user32', use_last_error=True)
@@ -32,7 +32,7 @@ class Console:
             kernel32.CloseHandle(window_handle)
 
     @staticmethod
-    def workload_type():
+    def workload_type() -> str:
         """returns the salad workload type"""
         for process in psutil.process_iter(['pid', 'name']):
             if psutil.pid_exists(process.info['pid']):
@@ -49,7 +49,7 @@ class WebScraper:
     driver = None
 
     @staticmethod
-    def load_login_page(email: str):
+    def load_login_page(email: str) -> None:
         """loads chrome driver and redirects to https://salad.com/login"""
         print("loading login page")
 
@@ -66,7 +66,7 @@ class WebScraper:
             sys.exit()
 
     @staticmethod
-    def input_email(email: str):
+    def input_email(email: str) -> None:
         """fills out email, accepts tos and logs in"""
         print("loading login page")
         try:
@@ -99,7 +99,7 @@ class WebScraper:
             sys.exit()
 
     @staticmethod
-    def verify_email(auth_code: str):
+    def verify_email(auth_code: str) -> None:
         """inputs auth code after user types it"""
         print("identifying auth page")
         try:
@@ -118,7 +118,7 @@ class WebScraper:
             sys.exit()
 
     @staticmethod
-    def fix_reirect():
+    def fix_reirect() -> None:
         """redirect workaround for salad's website"""
         print("attempting redirect")
         url = "https://salad.com/earn/summary"
@@ -133,7 +133,7 @@ class WebScraper:
             print(f"error redirecting to summary page, close program and try again\n{e}\n")
 
     @staticmethod
-    def scrape_stats():
+    def scrape_stats() -> None:
         """scrapes chopping stats from https://salad.com/summary"""
         Console.clear()
         print("scraping stats from /summary")
@@ -211,7 +211,7 @@ class Conditions:
 
 class Callbacks:
     @staticmethod
-    def submit():
+    def submit() -> str | None:
         """submit button functionality"""
         textbox_value = str(dearpygui.get_value("textbox_email"))
 
