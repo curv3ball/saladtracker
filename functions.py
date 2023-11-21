@@ -37,6 +37,25 @@ class Console:
             if process.info['name'] == "vmmem":
                 return psutil.pid_exists(process.info['pid'])
         return False
+    
+    @staticmethod
+    def workload_type():
+        """returns true is vmmem process is running (salad container)"""
+        workload = None
+        for process in psutil.process_iter(['pid', 'name']):
+            if process.info['name'] == "vmmem":
+                if psutil.pid_exists(process.info['pid']):
+                    workload = "Container"
+            elif process.info['name'] == "t-rex.exe":
+                if psutil.pid_exists(process.info['pid']):
+                    workload = "T-Rex"
+            elif process.info['name'] == "xmrig": # idk the process name i have to wait until a xmrig job or you can dm me if you have one
+                if psutil.pid_exists(process.info['pid']):
+                    workload = "XMRig"
+            else:
+                workload = "Unknown"
+
+        return workload
 
 class WebScraper:
     driver = None
@@ -146,7 +165,7 @@ class WebScraper:
             borders_outerH=True, parent=window_settings.WINDOW_TAG, tag="table_stats"):
 
             dearpygui.add_table_column(label="Hours", width_stretch=True)
-            dearpygui.add_table_column(label="Container", width_stretch=True)
+            dearpygui.add_table_column(label="Workload", width_stretch=True)
             dearpygui.add_table_column(label="Balance", width_stretch=True)
 
             while True:
@@ -170,7 +189,7 @@ class WebScraper:
                         else:
                             print(f"error getting stats for ['{label}', '{value}']")
                     
-                    cf = "Active" if Console.container_found() else "Inactive"
+                    cf = Console.workload_type()
 
                     if dearpygui.does_item_exist("table_stats"):
                         for tag in dearpygui.get_item_children("table_stats")[1]:
