@@ -32,14 +32,6 @@ class Console:
             kernel32.CloseHandle(window_handle)
 
     @staticmethod
-    def container_found():
-        """returns true is vmmem process is running (salad container)"""
-        for process in psutil.process_iter(['pid', 'name']):
-            if process.info['name'] == "vmmem":
-                return psutil.pid_exists(process.info['pid'])
-        return False
-
-    @staticmethod
     def workload_type():
         """returns the salad workload type"""
         for process in psutil.process_iter(['pid', 'name']):
