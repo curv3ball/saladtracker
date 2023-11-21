@@ -1,8 +1,8 @@
 from os import system
 import ctypes
 import time
+import sys
 import psutil
-from widgets import Widgets
 from dearpygui import dearpygui
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchWindowException
+from widgets import Widgets
 from init import window_settings
 
 class Console:
@@ -37,7 +38,7 @@ class Console:
             if process.info['name'] == "vmmem":
                 return psutil.pid_exists(process.info['pid'])
         return False
-    
+
     @staticmethod
     def workload_type():
         """returns true is vmmem process is running (salad container)"""
@@ -49,7 +50,8 @@ class Console:
             elif process.info['name'] == "t-rex.exe":
                 if psutil.pid_exists(process.info['pid']):
                     workload = "T-Rex"
-            elif process.info['name'] == "xmrig": # idk the process name i have to wait until a xmrig job or you can dm me if you have one
+            # idk the process name i have to wait until a xmrig job or you can dm me if you have one
+            elif process.info['name'] == "xmrig":
                 if psutil.pid_exists(process.info['pid']):
                     workload = "XMRig"
             else:
@@ -75,6 +77,7 @@ class WebScraper:
             WebScraper.input_email(email)
         except Exception:
             print("falied to open the login page, close program and try again")
+            sys.exit()
 
     @staticmethod
     def input_email(email: str):
@@ -97,6 +100,7 @@ class WebScraper:
             time.sleep(1)
         except Exception:
             print("failed inputting email, close program and try again")
+            sys.exit()
 
         # update the labels to prepare for auth
         try:
@@ -106,6 +110,7 @@ class WebScraper:
             time.sleep(0.5)
         except Exception:
             print("error updating labels to auth mode")
+            sys.exit()
 
     @staticmethod
     def verify_email(auth_code: str):
@@ -124,7 +129,7 @@ class WebScraper:
             WebScraper.fix_reirect()
         except NoSuchWindowException as e:
             print(f"error locating auth page, close program and try again [{type(e).__name__}]")
-            exit(0)
+            sys.exit()
 
     @staticmethod
     def fix_reirect():
@@ -140,7 +145,7 @@ class WebScraper:
             WebScraper.scrape_stats()
         except Exception as e:
             print(f"error redirecting to summary page, close program and try again\n{e}\n")
-    
+
     @staticmethod
     def scrape_stats():
         """scrapes chopping stats from https://salad.com/summary"""
@@ -153,12 +158,12 @@ class WebScraper:
 
         cb = None
         mh = None
-        lb = None
-        rr = None
+        #lb = None
+        #rr = None
         start_time = time.time()
 
         imgui = Widgets()
-        imgui.label(f"Elapsed Time: 0s", "label_updates")
+        imgui.label("Elapsed Time: 0s", "label_updates")
         # do something with the data, figure out how to plot it maybe would be cool
         with dearpygui.table(header_row=True, policy=dearpygui.mvTable_SizingFixedFit, no_host_extendX=False,
             borders_innerV=True, delay_search=True, borders_outerV=True, borders_innerH=True,
@@ -188,7 +193,7 @@ class WebScraper:
                             rr = value.replace(" rewards", "").replace(" reward", "")
                         else:
                             print(f"error getting stats for ['{label}', '{value}']")
-                    
+
                     cf = Console.workload_type()
 
                     if dearpygui.does_item_exist("table_stats"):
@@ -201,7 +206,7 @@ class WebScraper:
                         dearpygui.add_text(cb)
                 except NoSuchWindowException as e:
                     print(f"error scraping stats [{type(e).__name__}]:\n{e} | {label} | {value}\n")
-                    exit(0)
+                    sys.exit(0)
 
                 # Calculate days, hours, minutes, and seconds
                 elapsed_time = time.time() - start_time
@@ -214,27 +219,28 @@ class WebScraper:
 
 class Conditions:
     """callback conditions that determine how the Callbacks.submit function will run"""
-    LOGGING_IN      = False
-    LOGGING_IN_TIME = None
-    AWAITING_AUTH   = False
+    LOGGING_IN         : bool = False
+    LOGGING_IN_TIME    : int  = None
+    AWAITING_AUTH      : bool = False
 
 class Callbacks:
     @staticmethod
     def submit():
+        """submit button functionality"""
         textbox_value = str(dearpygui.get_value("textbox_email"))
-        
+
         if Conditions.AWAITING_AUTH:
             if len(textbox_value) != 4 or not textbox_value.isdigit():
                 print("invalid auth code, check it and try again")
                 return
             WebScraper.verify_email(textbox_value)
         else:
-            
+
             if Conditions.LOGGING_IN and time.time() - Conditions.LOGGING_IN_TIME < 15:
                 remaining_time = 15 - (time.time() - Conditions.LOGGING_IN_TIME)
                 print(f"You must wait {remaining_time:.0f} seconds before you can send another email")
                 return
-    
+
             if not any(s in textbox_value for s in ["@", ".com"]) or textbox_value.strip() == "":
                 print("invalid email")
                 return
