@@ -39,7 +39,7 @@ So you will not get in trouble for **using** this, but it is generally not allow
  - ❌ Check your referral bonuses / stats
  - ❌ Notify salad alerts
  - ❌ Notify salad bonuses
- - ✅ Automatically buy reward **[THIS IS AGAINST SALAD TOS AND IS NOT AVAILABLE IN THE PUBLIC SOURCE CODE]**
+ - ✅ Automatically buy reward **[THIS IS AGAINST SALAD TOS AND IS NOT AVAILABLE IN THE PUBLIC SOURCE]**
 </details>
 
 ___
