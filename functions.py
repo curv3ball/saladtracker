@@ -41,23 +41,17 @@ class Console:
 
     @staticmethod
     def workload_type():
-        """returns true is vmmem process is running (salad container)"""
-        workload = None
+        """returns the salad workload type"""
         for process in psutil.process_iter(['pid', 'name']):
-            if process.info['name'] == "vmmem":
-                if psutil.pid_exists(process.info['pid']):
-                    workload = "Container"
-            elif process.info['name'] == "t-rex.exe":
-                if psutil.pid_exists(process.info['pid']):
-                    workload = "T-Rex"
-            # idk the process name i have to wait until a xmrig job or you can dm me if you have one
-            elif process.info['name'] == "xmrig":
-                if psutil.pid_exists(process.info['pid']):
-                    workload = "XMRig"
-            else:
-                workload = "Unknown"
-
-        return workload
+            if psutil.pid_exists(process.info['pid']):
+                process_name = process.info['name']
+                if process_name == "vmmem":
+                    return "Container"
+                elif process_name == "t-rex.exe":
+                    return "T-Rex"
+                elif process_name == "xmrig":
+                    return "XMRig"
+        return "Unknown"
 
 class WebScraper:
     driver = None
