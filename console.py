@@ -2,7 +2,6 @@ import functools
 import datetime
 import time
 import os
-import sys
 
 class SaladNotRunningException(Exception):
     """Exception raised when Salad.exe is not running."""
