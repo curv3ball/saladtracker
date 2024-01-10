@@ -5,7 +5,6 @@ import GPUtil
 
 from console import loggable
 
-
 @loggable
 def ram() -> tuple:
     """

@@ -6,7 +6,6 @@ class WebData:
     CURRENT_BALANCE: float = 0.00
 
 class Settings:
-    """Class for storing and managing settings."""
-    EMAIL       : str = ''
-    BOT_TOKEN   : str = ''
-    DEBUG       : bool = False
+    EMAIL: str = ''
+    BOT_TOKEN: str = ''
+    DEBUG: bool = False
