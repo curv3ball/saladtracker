@@ -6,7 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import os
-from data import WebData
+from data import WebData, Globals
+from datetime import datetime
 
 # Will be driver instance later on
 driver = None
@@ -79,17 +80,18 @@ def input_email(email: str) -> None:
         current_balance_xpath = '//*[@id="root"]/div/div[2]/div[2]/div[1]/div/div[1]/div/div[1]/div[2]/div[1]/div[2]'
         lifetime_balance_xpath = '//*[@id="root"]/div/div[2]/div[2]/div[1]/div/div[1]/div/div[1]/div[2]/div[2]/div[2]'
 
+        Globals.SCRIPT_START_TIME = datetime.now()
+
         while True:
             current_balance = float(WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, current_balance_xpath))).text.replace('$', ''))
             lifetime_balance = float(WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, lifetime_balance_xpath))).text.replace('$', ''))
-
 
             WebData.CURRENT_BALANCE = current_balance
             WebData.LIFETIME_BALANCE = lifetime_balance
 
             # redeem start here
             pass
-        
+
             time.sleep(1)
 
     load_loginpage()

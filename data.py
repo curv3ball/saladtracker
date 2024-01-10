@@ -5,6 +5,7 @@ class Globals:
 class WebData:
     CURRENT_BALANCE: float = 0.00
     LIFETIME_BALANCE: float = 0.00
+    
 class Settings:
     EMAIL: str = ''
     BOT_TOKEN: str = ''
