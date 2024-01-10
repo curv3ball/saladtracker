@@ -20,6 +20,21 @@ bot = commands.Bot(
 @tasks.loop(seconds=1)
 async def send_embed():
     """Send system information as an embedded message to a Discord channel."""
+
+
+    """ HOW IT WILL LOOK IN THE EMBED:
+    -------------------------------------------
+    | Salad Tracker [BOT]                     |
+    |                                         |
+    | CPU         GPU                RAM      |
+    | OK          99%                75%      |
+    |                                         |
+    | Workload    Uptime             Balance  |
+    | Unknown     00:00:00:00        $0.00    |
+    |                                         |
+    | Microsoft Windows 10 Home (19045)       |
+    -------------------------------------------
+    """
     try:
         # Retrieve system information
         cpu_clockspeed, cpu_name, _, _, cpu_status = system.cpu()
