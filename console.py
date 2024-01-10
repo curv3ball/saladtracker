@@ -80,7 +80,6 @@ def loggable(func):
 
             # Ensure the logs folder exists
             os.makedirs(folder_path, exist_ok=True)
-            os.makedirs(os.path.join(folder_path, "screenshots"), exist_ok=True)
 
             # Write the log message to the log file
             with open(file_path, 'a', encoding='utf-8') as log_file:
