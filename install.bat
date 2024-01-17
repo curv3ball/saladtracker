@@ -1,19 +1,12 @@
 @echo off
-echo Installing required packages...
+echo Installing required Python packages...
 
-REM Install matplotlib
 pip install matplotlib
-
-REM Install psutil
+pip install asyncio
 pip install psutil
-
-REM Install gputil
+pip install discord.py
+pip install configparser
 pip install gputil
 
-REM Install discord
-pip install discord
-
-cls
-echo Installation complete.
-echo Please setup config.ini
+echo Installation complete. Please setup config.ini
 pause
