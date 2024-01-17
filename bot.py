@@ -501,7 +501,10 @@ async def send_embed():
         {ram_info}
 
         [ SALAD ]
+        Status:     {salad_running}
         Balance:    {logdata.CURRENT_BALANCE}
+        Next Day:   {next_day}
+        Last Day:   {last_day}
         Workload:   {workload}
 
         [ BOT ]
