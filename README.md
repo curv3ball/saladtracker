@@ -11,4 +11,4 @@
 - Run install.bat
 - Set token and channel id in config.ini
 - Run bot.py
-- **Alternatively, just setup config.ini and run the [released .exe](https://github.com/curv3ball/saladtracker/releases/download/release/salad_tracker.exe)**
+- **Alternatively, just setup config.ini and run the [released .exe](https://github.com/curv3ball/saladtracker/releases/download/release/SaladTracker.exe)**
