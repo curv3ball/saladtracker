@@ -472,7 +472,7 @@ async def send_embed():
         fixed_width = 15
 
         cpu_info = f"CPU: {cpu_name} {cpu_clockspeed}".ljust(max_length + fixed_width) + f"[ {cpu_status} ]"
-        gpu_info = f"GPU: {gpu_name} {gpu_memory}".ljust(max_length + fixed_width) + f"[ {gpu_load} ]"
+        gpu_info = f"GPU: {gpu_name} {gpu_memory}".ljust(max_length + fixed_width) + f"[ {gpu_load}% ]"
         ram_info = f"RAM: {ram_manufacturer} {ram_partnumber}".ljust(max_length + fixed_width) + f"[ {ram_percent} ]"
 
         console.log(f"""
@@ -482,7 +482,11 @@ async def send_embed():
         {ram_info}
 
         [ SALAD ]
-        Balance: {logdata.CURRENT_BALANCE}
+        Balance:    {logdata.CURRENT_BALANCE}
+        Workload:   {workload}
+
+        [ BOT ]
+        Uptime:     {formatted_uptime}
         """, clear=True)
 
     except Exception as e:
@@ -525,6 +529,13 @@ if __name__ == '__main__':
 
         console.log('[ Bot ] => loading config object', clear=True)
         # Config object
+        if not os.path.exists('config.ini'):
+            console.log('[ Bot ] => no config detected, generating now. Please fill it out')
+            with open('config.ini', 'w') as file:
+                file.write('[Bot]\nToken = token_here\nChannel = channel_id_here')
+            input()
+            os._exit(0)
+
         config = configparser.ConfigParser()
         config.read('config.ini')
 
