@@ -24,5 +24,5 @@
 ```
 
 #### How to use
-- Open config.ini and set your email (the email used for your salad account)
-- Run bot.py, wait until it asks for your 2fa code, then enter your 2fa code
+- Open config.ini and set your bot token and desired channel id
+- Run bot.py

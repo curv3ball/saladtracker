@@ -156,13 +156,11 @@ async def send_embed():
     except Exception as e:
         log(f"Error in send_embed: {e}")
 
-@loggable
 def plotter_wrapper(debug = False):
     loop1 = asyncio.new_event_loop()
     asyncio.set_event_loop(loop1)
     loop1.run_until_complete(plotter.generate_graph(debug))
 
-@loggable
 def balance_wrapper():
     loop2 = asyncio.new_event_loop()
     asyncio.set_event_loop(loop2)
@@ -200,7 +198,6 @@ if __name__ == '__main__':
         # Populate settings from config.ini
         log('[ Bot ] => importing settings')
         Settings.EMAIL = config['General']['Email']
-        Settings.DEBUG = config.getboolean('General', 'Debug')
         Settings.BOT_TOKEN = config['Bot']['Token']
         Settings.BOT_CHANNEL = config.getint('Bot', 'Channel')
 
