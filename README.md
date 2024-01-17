@@ -11,7 +11,7 @@
   - Use google if you need help or dm me on discord @nypdk  
 
 #### How to use source code
-- Download [Python 3.11.7]()
+- Download [Python 3.11.7](https://www.python.org/downloads/release/python-3117/)
 - Download the source
 - Run install.bat
 - Run bot.py
