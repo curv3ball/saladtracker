@@ -3,9 +3,6 @@ import subprocess
 import psutil
 import GPUtil
 
-from console import loggable
-
-@loggable
 def ram() -> tuple:
     """
     Retrieve information about system RAM.
@@ -36,7 +33,6 @@ def ram() -> tuple:
     items_converted = tuple(item for item in items)
     return items_converted
 
-@loggable
 def cpu() -> tuple:
     """
     Retrieve information about the CPU.
@@ -63,7 +59,6 @@ def cpu() -> tuple:
     items_converted = tuple(item for item in items)
     return items_converted
 
-@loggable
 def gpu() -> tuple:
     """
     Retrieve information about the GPU.
@@ -91,7 +86,6 @@ def gpu() -> tuple:
     items_converted = tuple(item for item in items)
     return items_converted
 
-@loggable
 def os() -> tuple:
     """
     Retrieve information about the OS.
@@ -114,7 +108,6 @@ def os() -> tuple:
     items_converted = tuple(item for item in items)
     return items_converted
 
-@loggable
 def workload_type() -> str:
     """Returns the salad workload type."""
     process_names = { "vmmem": "Vmmem", "t-rex.exe": "T-Rex", "xmrig": "XMRig"}

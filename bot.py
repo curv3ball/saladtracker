@@ -1,23 +1,24 @@
 import asyncio
 import psutil
-import shutil
+import threading
+import os
 from datetime import datetime, timedelta
 
 import discord
 import configparser
 from discord.ext import commands, tasks
 
-from console import log, SaladNotRunningException
-from data import Globals, WebData, Settings
+from console import log, SaladNotRunningException, loggable
+from data import Globals, LogData, Settings
 import system
-import webscraper
+import plotter
 
 bot = commands.Bot(
     command_prefix='.',
     intents=discord.Intents.all()
 )
 
-@tasks.loop(seconds=1)
+@tasks.loop(seconds=5)
 async def send_embed():
     """Send system information as an embedded message to a Discord channel."""
 
@@ -31,6 +32,20 @@ async def send_embed():
     |                                         |
     | Workload    Uptime             Balance  |
     | Unknown     00:00:00:00        $0.00    |
+    |                                         |
+    |  _____________________________________  |
+    | |                                     | |
+    | |  _________________________________  | |
+    | | |                                 | | |
+    | | |    Container Earnigns Chart     | | |
+    | | |                                 | | |
+    | | |_________________________________| | |
+    | |  _________________________________  | |
+    | | |                                 | | |
+    | | |      Wallet Balance Chart       | | |
+    | | |                                 | | |
+    | | |_________________________________| | |
+    | |_____________________________________| |
     |                                         |
     | Microsoft Windows 10 Home (19045)       |
     -------------------------------------------
@@ -58,7 +73,7 @@ async def send_embed():
         Globals.SCRIPT_UP_TIME = formatted_uptime
 
         # Balance
-        current_balance = f'{WebData.CURRENT_BALANCE:.2f}'
+        current_balance = f'{LogData.CURRENT_BALANCE:.2f}'
 
         # Embed object
         embed = discord.Embed(colour=0x009afa)
@@ -98,6 +113,8 @@ async def send_embed():
             inline=True
         )
 
+        #current_balance = 718.92
+
         # Salad balance
         embed.add_field(
             name="Balance",
@@ -105,26 +122,51 @@ async def send_embed():
             inline=True
         )
 
+        file_path = 'graph.png'
+        
+        # Check if the file exists
+        file = None
+        if os.path.exists(file_path):
+            file = discord.File(file_path, filename=file_path)
+            embed.set_image(url=f'attachment://graph.png')
+
         # Windows version (footer)
         embed.set_footer(text=f"{os_version} ({os_build.rsplit('.', 1)[-1]})")
 
         # Send the embed to the specified Discord channel
         channel = bot.get_channel(Settings.BOT_CHANNEL)
 
-        # Send message if no previous message, else edit old one
+        # Check if there's a previous message
         if Globals.LAST_MESSAGE_ID is not None:
             try:
-                message = await channel.fetch_message(Globals.LAST_MESSAGE_ID)
-                await message.edit(embed=embed)
-            except Exception:
-                message = await channel.send(embed=embed)
-                Globals.LAST_MESSAGE_ID = message.id
+                # Fetch the old message and delete it
+                old_message = await channel.fetch_message(Globals.LAST_MESSAGE_ID)
+                await old_message.delete()
+
+                # Send the new embed with the updated file
+                new_message = await channel.send(embed=embed, file=file)
+                Globals.LAST_MESSAGE_ID = new_message.id
+            except Exception as e:
+                log(f"Error updating message: {e}")
         else:
-            message = await channel.send(embed=embed)
+            # Send a new message with the embed and file
+            message = await channel.send(embed=embed, file=file)
             Globals.LAST_MESSAGE_ID = message.id
 
     except Exception as e:
         log(f"Error in send_embed: {e}")
+
+@loggable
+def plotter_wrapper(debug = False):
+    loop1 = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop1)
+    loop1.run_until_complete(plotter.generate_graph(debug))
+
+@loggable
+def balance_wrapper():
+    loop2 = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop2)
+    loop2.run_until_complete(plotter.get_balance())
 
 @bot.event
 async def on_ready():
@@ -132,17 +174,14 @@ async def on_ready():
     try:
         log(f'[ Bot ] Discord bot online | Channel: {Settings.BOT_CHANNEL}', clear=True)
 
-        send_embed.start()
-
         Globals.SCRIPT_START_TIME = datetime.now()
-        # Gather and await the results of the wrapper function
-        await asyncio.gather(
-            await asyncio.to_thread(
-                webscraper.input_email,  # function
-                Settings.EMAIL  # args
-            )
-        )
-
+        
+        # Start threads
+        plotter_thread = threading.Thread(target=plotter_wrapper, args=(True,))
+        balance_thread = threading.Thread(target=balance_wrapper)
+        plotter_thread.start()
+        balance_thread.start()
+        send_embed.start()
     except Exception as e:
         log(f"Error in on_ready: {e}")
 

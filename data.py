@@ -2,8 +2,9 @@ class Globals:
     SCRIPT_START_TIME = None
     LAST_MESSAGE_ID = None
     SCRIPT_UP_TIME = None
+    FILE_SENT = False
 
-class WebData:
+class LogData:
     CURRENT_BALANCE: float = 0.00
 
 class Settings:
