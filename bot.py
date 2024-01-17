@@ -27,6 +27,8 @@ class globals:
 
 class logdata:
     CURRENT_BALANCE: float = 0.00
+    PREDICTED_EARNINGS: float = 0.00
+    LAST_DAY: float = 0.00
 
 class settings:
     BOT_TOKEN: str = ''
@@ -140,7 +142,7 @@ class system:
 
     def workload_type() -> str:
         """Returns the salad workload type."""
-        process_names = { "vmmem": "Vmmem", "t-rex.exe": "T-Rex", "xmrig": "XMRig"}
+        process_names = { "vmmem": "Container", "t-rex.exe": "T-Rex", "xmrig": "XMRig"}
         
         for process in psutil.process_iter(['pid', 'name']):
             pid = process.info['pid']
@@ -242,12 +244,14 @@ class plotter:
             console.log("[Plotter] => Initialize data structures") if debug else None
             earnings_data = []
             wallet_data = []
+            predicted_data = []
 
             # Define patterns for data extraction
             console.log("[Plotter] => Pattern setup") if debug else None
             patterns = [
                 (r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?Predicted Earnings Report: ([\d.]+)', float, earnings_data),
                 (r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?Wallet: Current\(([\d.]+)\)', float, wallet_data),
+                (r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?Wallet: Current\(([\d.]+)\), Predicted\(([\d.]+)\)', float, predicted_data),
             ]
 
             # Get all files in the base directory
@@ -269,6 +273,18 @@ class plotter:
 
             earnings_data = plotter.sample_data(earnings_data, max_points)
             wallet_data = plotter.sample_data(wallet_data, max_points)
+
+            # Extract predicted earnings report
+            logdata.PREDICTED_EARNINGS = wallet_data[-1][1] if wallet_data else None
+
+            # Calculate earnings over the last 24 hours
+            current_time = datetime.now()
+            twenty_four_hours_ago = current_time - timedelta(hours=24)
+
+            last24_filtered = [(timestamp, value) for timestamp, value in earnings_data if timestamp >= twenty_four_hours_ago]
+
+            # Sum up earnings within the last 24 hours
+            logdata.LAST_DAY = sum(value for _, value in last24_filtered)
 
             # Clear the plots
             plt.clf()
@@ -337,34 +353,6 @@ class console:
 @tasks.loop(seconds=5)
 async def send_embed():
     """Send system information as an embedded message to a Discord channel."""
-
-
-    """ HOW IT WILL LOOK IN THE EMBED:
-    -------------------------------------------
-    | Salad Tracker [BOT]                     |
-    |                                         |
-    | CPU         GPU                RAM      |
-    | OK          99%                75%      |
-
-    | Workload    Uptime             Balance  |
-    | Unknown     00:00:00:00        $0.00    |
-    |  _____________________________________  |
-    | |                                     | |
-    | |  _________________________________  | |
-    | | |                                 | | |
-    | | |    Container Earnigns Chart     | | |
-    | | |                                 | | |
-    | | |_________________________________| | |
-    | |  _________________________________  | |
-    | | |                                 | | |
-    | | |      Wallet Balance Chart       | | |
-    | | |                                 | | |
-    | | |_________________________________| | |
-    | |_____________________________________| |
-    |                                         |
-    | Microsoft Windows 10 Home (19045)       |
-    -------------------------------------------
-    """
     try:
         # Retrieve system information
         cpu_clockspeed, cpu_name, _, _, cpu_status = system.cpu()
@@ -389,6 +377,16 @@ async def send_embed():
 
         # Balance
         current_balance = f'{logdata.CURRENT_BALANCE:.2f}'
+        next_day = f'{logdata.PREDICTED_EARNINGS:.2f}'
+        last_day = f'{logdata.LAST_DAY:.2f}'
+
+        salad_running = (
+            "Active"
+            if any(process.info['name'] == 'Salad.exe'
+                for process in psutil.process_iter(['pid', 'name']))
+            else
+            "Inactive"
+        )
 
         # Embed object
         embed = discord.Embed(colour=discord.colour.Color.from_rgb(0, 0, 0))
@@ -425,6 +423,27 @@ async def send_embed():
         embed.add_field(
             name="Uptime",
             value=f"**{formatted_uptime}**",
+            inline=True
+        )
+
+        # Plotting
+        embed.add_field(
+            name="Salad",
+            value=f"**{salad_running}**",
+            inline=True
+        )
+
+        # Last 24hrs
+        embed.add_field(
+            name="Last Day",
+            value=f"**${last_day}**",
+            inline=True
+        )
+
+        # Next 24hrs
+        embed.add_field(
+            name="Next Day",
+            value=f"**${next_day}**",
             inline=True
         )
 
@@ -522,11 +541,6 @@ async def on_ready():
 
 if __name__ == '__main__':
     try:
-        console.log('[ Bot ] => searching for salad process', clear=True)
-        # Check if Salad.exe is running
-        if not any(process.info['name'] == 'Salad.exe' for process in psutil.process_iter(['pid', 'name'])):
-            raise console.SaladNotRunningException
-
         console.log('[ Bot ] => loading config object', clear=True)
         # Config object
         if not os.path.exists('config.ini'):
